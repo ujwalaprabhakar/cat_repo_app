@@ -21,6 +21,8 @@ function CatBoard() {
   // console.log("serverData:", serverData);
   // We'll start our table without any data
   const [data, setData] = useState([]);
+  const [catName, setCatName] = useState("");
+  const [responseMessage, setResponseMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(false);
@@ -37,6 +39,16 @@ function CatBoard() {
       setData(cats);
       setPageCount(3);
       setHasNextPage(response.metadata.hasNextPage);
+    });
+  };
+
+  const addCat = () => {
+    CatService.addNewCat(catName).then((response) => {
+      if (response.ctime != undefined) {
+        setResponseMessage("Cat added!");
+      } else {
+        setResponseMessage("Error while adding Cat.");
+      }
     });
   };
   const fetchData = useCallback(({ pageSize, pageIndex }) => {
@@ -68,14 +80,34 @@ function CatBoard() {
   }, []);
 
   return (
-    <CustomTable
-      columns={columns}
-      data={data}
-      fetchData={fetchData}
-      loading={loading}
-      pageCount={pageCount}
-      canNextPage={hasNextPage}
-    />
+    <div id="container">
+      <div class="padBottom">
+        <span class="padRight10">
+          <input
+            type="text"
+            id="catName"
+            onChange={(e) => {
+              setCatName(e.target.value);
+            }}
+          ></input>
+        </span>
+        <span class="padRight10">
+          <button class="padRight10" onClick={addCat}>
+            Add Cat
+          </button>
+        </span>
+        <span class="padRight10">{responseMessage}</span>
+      </div>
+      <hr></hr>
+      <CustomTable
+        columns={columns}
+        data={data}
+        fetchData={fetchData}
+        loading={loading}
+        pageCount={pageCount}
+        canNextPage={hasNextPage}
+      />
+    </div>
   );
 }
 

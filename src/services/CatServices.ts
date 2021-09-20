@@ -1,6 +1,6 @@
 import axios from "axios";
 import { CatList } from "../types";
-import { deepCamelCaseKeys } from "../utils/utils";
+import { deepCamelCaseKeys, deepSnakeCaseKeys } from "../utils/utils";
 
 const getAllCats = async (
   pageNumber: Number,
@@ -12,16 +12,23 @@ const getAllCats = async (
 
   const { data } = await axios.get(url);
 
-  // const { data } = await axios.get(
-  //   `http://localhost:10000/v1/cats?sort_by=id&page_number=2&page_size=10`
-  // );
+  const result = deepCamelCaseKeys(data);
+  return result;
+};
+
+const addNewCat = async (catName: String) => {
+  const payload = { name: catName };
+
+  const url = "http://localhost:10000/v1/cats";
+
+  const { data } = await axios.post(url, payload);
 
   const result = deepCamelCaseKeys(data);
-  // console.log(listCats);
-  // return listCats.results;
+
   return result;
 };
 
 export default {
   getAllCats,
+  addNewCat,
 };
