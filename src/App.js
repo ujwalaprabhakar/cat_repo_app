@@ -1,14 +1,15 @@
 // import logo from "./logo.svg";
 import "./App.css";
-import CatList from "./components/CatList";
-import Home from "./components/Home";
-
+// import CatCatalogue from "./components/CatCatalogue";
+import CatBoard from "./components/CatBoard";
+// import Home from "./components/Home";
+// import CustomTable from "./components/CustomTable";
 function App() {
   return (
     <div>
-      <CatList></CatList>
+      <CatBoard></CatBoard>
 
-      <Home></Home>
+      {/* <Home></Home> */}
     </div>
   );
 }
