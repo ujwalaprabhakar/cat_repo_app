@@ -1,145 +1,130 @@
 import React, { useState, useEffect } from "react";
 
 import CatService from "../services/CatServices";
-import { useTable, usePagination } from "react-table";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashAlt, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 function CatCatalogue() {
+  const pageSize = 10;
   const [data, setData] = useState([]);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [catName, setCatName] = useState("");
+  const [responseMessage, setResponseMessage] = useState("");
 
-  const getCats = () => {
-    CatService.getAllCats().then((cats) => {
-      if (cats.length === 0) {
-        return;
-      }
+  const getCats = (pageIndex) => {
+    CatService.getAllCats(pageIndex, pageSize).then((response) => {
+      const cats = response.results;
 
       setData(cats);
+      setPageIndex(pageIndex);
+      setHasNextPage(response.metadata.hasNextPage);
     });
   };
 
   useEffect(() => {
-    getCats();
+    const pageIndex = 1;
+    getCats(pageIndex);
   }, []);
 
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: "ID",
-        accessor: "id", // accessor is the "key" in the data
-      },
-      {
-        Header: "Cat Name",
-        accessor: "name",
-      },
-    ],
-    []
-  );
+  const moveToNextPage = () => {
+    getCats(pageIndex + 1);
+  };
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
+  const moveToPrevPage = () => {
+    getCats(pageIndex - 1);
+  };
 
-    prepareRow,
-    page, // Instead of using 'rows', we'll use page,
-    // which has only the rows for the active page
+  const addCat = () => {
+    CatService.addNewCat(catName).then((response) => {
+      if (response.ctime != undefined) {
+        setResponseMessage("Cat added!");
+      } else {
+        setResponseMessage("Error while adding Cat.");
+      }
+    });
+  };
 
-    // The rest of these things are super handy, too ;)
-    canPreviousPage,
-    canNextPage,
-    pageOptions,
-    pageCount,
-    gotoPage,
-    nextPage,
-    previousPage,
-    setPageSize,
-    state: { pageIndex, pageSize },
-  } = useTable(
-    {
-      columns,
-      data,
-      initialState: { pageIndex: 0 },
-      manualPagination: true,
-      pageCount: controlledPageCount,
-    },
-    usePagination
-  );
+  const deleteSelectedCat = (catId) => {
+    CatService.deleteCat(catId).then((response) => {
+      if (response) {
+        alert("Cat deleted!!!");
+      }
+      getCats(pageIndex);
+    });
+  };
 
   return (
-    <>
-      <table {...getTableProps()}>
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()}>{column.render("Header")}</th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {page.map((row, i) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => {
-                  return (
-                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                  );
-                })}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      {/* 
-        Pagination can be built however you'd like. 
-        This is just a very basic UI implementation:
-      */}
-      <div className="pagination">
-        <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
-          {"<<"}
-        </button>{" "}
-        <button onClick={() => previousPage()} disabled={!canPreviousPage}>
-          {"<"}
-        </button>{" "}
-        <button onClick={() => nextPage()} disabled={!canNextPage}>
-          {">"}
-        </button>{" "}
-        <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
-          {">>"}
-        </button>{" "}
-        <span>
-          Page{" "}
-          <strong>
-            {pageIndex + 1} of {pageOptions.length}
-          </strong>{" "}
-        </span>
-        <span>
-          | Go to page:{" "}
+    <div id="container">
+      <div class="padBottom">
+        <span class="padRight10">
           <input
-            type="number"
-            defaultValue={pageIndex + 1}
+            type="text"
+            id="catName"
             onChange={(e) => {
-              const page = e.target.value ? Number(e.target.value) - 1 : 0;
-              gotoPage(page);
+              setCatName(e.target.value);
             }}
-            style={{ width: "100px" }}
-          />
-        </span>{" "}
-        <select
-          value={pageSize}
-          onChange={(e) => {
-            setPageSize(Number(e.target.value));
-          }}
-        >
-          {[10, 20, 30, 40, 50].map((pageSize) => (
-            <option key={pageSize} value={pageSize}>
-              Show {pageSize}
-            </option>
-          ))}
-        </select>
+          ></input>
+        </span>
+        <span class="padRight10">
+          <button class="padRight10" onClick={addCat}>
+            Add Cat
+          </button>
+        </span>
+        <span class="padRight10">{responseMessage}</span>
       </div>
-    </>
+      <hr></hr>
+      <div>
+        {!data ? (
+          "No Data"
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Cat Id</th>
+                <th>Cat Name</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {data.map((item) => (
+                <tr>
+                  <td>{item.id}</td>
+                  <td>{item.name}</td>
+                  <td>
+                    <FontAwesomeIcon
+                      icon={faTrashAlt}
+                      onClick={() => deleteSelectedCat(item.id)}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        <div>
+          <nav className="pagination">
+            <button
+              type="button"
+              class="btn btn-primary padRight10"
+              onClick={moveToPrevPage}
+              disabled={pageIndex == 1}
+            >
+              Previous
+            </button>
+
+            <button
+              class="btn btn-primary"
+              onClick={moveToNextPage}
+              disabled={!hasNextPage}
+            >
+              Next
+            </button>
+          </nav>
+        </div>
+      </div>
+    </div>
   );
 }
 

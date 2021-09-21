@@ -28,7 +28,18 @@ const addNewCat = async (catName: String) => {
   return result;
 };
 
+const deleteCat = async (catId: String) => {
+  const url = `http://localhost:10000/v1/cats/${catId}`;
+
+  const { data } = await axios.delete(url);
+
+  const result = deepCamelCaseKeys(data);
+
+  return result;
+};
+
 export default {
   getAllCats,
   addNewCat,
+  deleteCat,
 };

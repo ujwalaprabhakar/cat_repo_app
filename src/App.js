@@ -1,13 +1,10 @@
-// import logo from "./logo.svg";
 import "./App.css";
-// import CatCatalogue from "./components/CatCatalogue";
-import CatBoard from "./components/CatBoard";
-// import Home from "./components/Home";
-// import CustomTable from "./components/CustomTable";
+import CatCatalogue from "./components/CatCatalogue";
+
 function App() {
   return (
     <div>
-      <CatBoard></CatBoard>
+      <CatCatalogue></CatCatalogue>
 
       {/* <Home></Home> */}
     </div>
