@@ -2,11 +2,15 @@ import axiosClient from "../utils/axiosClient";
 import { CatSummaryList } from "../types";
 import { deepCamelCaseKeys, deepSnakeCaseKeys } from "../utils/utils";
 
-const getAllCats = async (
-  pageNumber: number,
-  pageSize: number,
-  sortBy: string
-): Promise<CatSummaryList> => {
+const getAllCats = async ({
+  pageNumber,
+  pageSize,
+  sortBy = "id",
+}: {
+  pageNumber: number;
+  pageSize: number;
+  sortBy?: "id" | "name";
+}): Promise<CatSummaryList> => {
   const params = deepSnakeCaseKeys({
     pageSize,
     pageNumber,

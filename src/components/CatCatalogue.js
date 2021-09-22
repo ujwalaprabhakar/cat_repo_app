@@ -3,9 +3,9 @@ import React, { useState, useEffect } from "react";
 import CatService from "../services/CatServices";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+const PAGE_SIZE = 10;
 
 function CatCatalogue() {
-  const pageSize = 10;
   const [cats, setCats] = useState([]);
   const [pageIndex, setPageIndex] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(false);
@@ -13,7 +13,11 @@ function CatCatalogue() {
   const [responseMessage, setResponseMessage] = useState("");
 
   const getCats = (pageIndex) => {
-    CatService.getAllCats(pageIndex, pageSize, "id").then((response) => {
+    CatService.getAllCats({
+      pageNumber: pageIndex,
+      pageSize: PAGE_SIZE,
+      sortBy: "id",
+    }).then((response) => {
       const cats = response.results;
 
       setCats(cats);
