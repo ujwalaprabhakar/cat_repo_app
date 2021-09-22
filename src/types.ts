@@ -1,6 +1,13 @@
-export type Cat = Readonly<{
-  id: string;
-  name: string;
+export type PagePaginatedData<ResponseDataType> = Readonly<{
+  results: ReadonlyArray<ResponseDataType>;
+  metadata: Readonly<{
+    hasNextPage: boolean;
+  }>;
 }>;
 
-export type CatList = ReadonlyArray<Cat>;
+export type CatSummary = {
+  id: string;
+  name: string;
+  url: string | null;
+};
+export type CatSummaryList = PagePaginatedData<CatSummary>;

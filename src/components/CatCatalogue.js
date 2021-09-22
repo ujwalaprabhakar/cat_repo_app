@@ -2,21 +2,21 @@ import React, { useState, useEffect } from "react";
 
 import CatService from "../services/CatServices";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashAlt, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
 function CatCatalogue() {
   const pageSize = 10;
-  const [data, setData] = useState([]);
+  const [cats, setCats] = useState([]);
   const [pageIndex, setPageIndex] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [catName, setCatName] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
 
   const getCats = (pageIndex) => {
-    CatService.getAllCats(pageIndex, pageSize).then((response) => {
+    CatService.getAllCats(pageIndex, pageSize, "id").then((response) => {
       const cats = response.results;
 
-      setData(cats);
+      setCats(cats);
       setPageIndex(pageIndex);
       setHasNextPage(response.metadata.hasNextPage);
     });
@@ -75,7 +75,7 @@ function CatCatalogue() {
       </div>
       <hr></hr>
       <div>
-        {!data ? (
+        {!cats ? (
           "No Data"
         ) : (
           <table>
@@ -88,8 +88,8 @@ function CatCatalogue() {
             </thead>
 
             <tbody>
-              {data.map((item) => (
-                <tr>
+              {cats.map((item) => (
+                <tr key={item.id}>
                   <td>{item.id}</td>
                   <td>{item.name}</td>
                   <td>
@@ -109,7 +109,7 @@ function CatCatalogue() {
               type="button"
               class="btn btn-primary padRight10"
               onClick={moveToPrevPage}
-              disabled={pageIndex == 1}
+              disabled={pageIndex === 1}
             >
               Previous
             </button>

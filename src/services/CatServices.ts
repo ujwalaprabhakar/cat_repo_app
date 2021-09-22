@@ -1,41 +1,37 @@
-import axios from "axios";
-import { CatList } from "../types";
+import axiosClient from "../utils/axiosClient";
+import { CatSummaryList } from "../types";
 import { deepCamelCaseKeys, deepSnakeCaseKeys } from "../utils/utils";
 
 const getAllCats = async (
-  pageNumber: Number,
-  pageSize: Number
-): Promise<any> => {
-  let url = "http://localhost:10000/v1/cats?sort_by=id";
-  url = url + "&page_number=" + pageNumber;
-  url = url + "&page_size=" + pageSize;
+  pageNumber: number,
+  pageSize: number,
+  sortBy: string
+): Promise<CatSummaryList> => {
+  const params = deepSnakeCaseKeys({
+    pageSize,
+    pageNumber,
+    sortBy,
+  });
 
-  const { data } = await axios.get(url);
+  const { data } = await axiosClient.get("/cats", { params });
 
-  const result = deepCamelCaseKeys(data);
-  return result;
+  return deepCamelCaseKeys(data);
 };
 
-const addNewCat = async (catName: String) => {
-  const payload = { name: catName };
+const addNewCat = async (name: String) => {
+  const params = deepSnakeCaseKeys({
+    name,
+  });
 
-  const url = "http://localhost:10000/v1/cats";
+  const { data } = await axiosClient.post("/cats", params);
 
-  const { data } = await axios.post(url, payload);
-
-  const result = deepCamelCaseKeys(data);
-
-  return result;
+  return deepCamelCaseKeys(data);
 };
 
 const deleteCat = async (catId: String) => {
-  const url = `http://localhost:10000/v1/cats/${catId}`;
+  const { data } = await axiosClient.delete(`/cats/${catId}`);
 
-  const { data } = await axios.delete(url);
-
-  const result = deepCamelCaseKeys(data);
-
-  return result;
+  return deepCamelCaseKeys(data);
 };
 
 export default {
